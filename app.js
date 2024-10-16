@@ -20,6 +20,11 @@ const errorHandlerMiddleware = require('./middleware/error-handler');
 const authRouter = require('./routes/auth')
 const jobRouter = require('./routes/jobs')
 
+// Swagger
+const swaggerUI = require('swagger-ui-express');
+const YAML = require('yamljs');
+const swaggerDocument = YAML.load('./swagger.yaml');
+
 app.set('trust proxy', 1)
 app.use(rateLimit({
   windowMs: 3 * 60 * 1000 , // 3 minutes
@@ -37,7 +42,9 @@ app.get('/', (req, res) => {
   res.send('jobs api');
 });
 
-app.use('/api/v1', authRouter)
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+
+app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/jobs', jobRouter)
 
 app.use(notFoundMiddleware);
